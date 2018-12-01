@@ -25,6 +25,7 @@ Adafruit_NeoPixel strip = Adafruit_NeoPixel(PIXEL_COUNT, PIXEL_PIN, NEO_RGB + NE
 
 bool oldState = HIGH;
 int showType = 0;
+int lastLed = -1;
 
 // For WiFi Star V1.0 LEDs 13 and 14 are swapped
 void setPixelColor(uint16_t n, uint32_t c) {
@@ -63,8 +64,8 @@ void setup() {
 }
 
 /** buttonPress
- * 
- */
+
+*/
 bool buttonChange( void ) {
   // Get current button state.
   bool newState = digitalRead(BUTTON_PIN);
@@ -77,12 +78,12 @@ bool buttonChange( void ) {
     newState = digitalRead(BUTTON_PIN);
     if (newState == LOW) {
       delay(50);
-      
+
       // Wait for button release
-      while( digitalRead(BUTTON_PIN) == LOW ) {
+      while ( digitalRead(BUTTON_PIN) == LOW ) {
         delay(20);
       }
-      
+
       return true;
     }
   }
@@ -116,7 +117,8 @@ void loop() {
     // Delay before change
     delay(500);
     showType++;
-    if (showType > 8)
+    colorWipe(strip.Color(0, 0, 0), 0);    // Black/off
+    if (showType > 9)
       showType = 0;
   }
   switch (showType) {
@@ -146,6 +148,8 @@ void loop() {
     case 7: rainbow(20);
       break;
     case 8: theaterChaseRainbow(50);
+      break;
+    case 9: randomSpot(250);
       break;
   }
 
@@ -256,6 +260,20 @@ void theaterChaseRainbow(uint8_t wait) {
     }
   }
 }
+
+void randomSpot( uint8_t wait) {
+  if ( lastLed >= 0 ) {
+    // Set lastLed to black
+    setPixelColor( lastLed, 0 );
+  }
+
+  lastLed = (int)random(0, 20);
+  setPixelColor( lastLed, strip.Color(random(0, 256), random(0, 256), random(0, 256)) );
+  strip.show();
+
+  delay(wait);
+}
+
 
 // Input a value 0 to 255 to get a color value.
 // The colours are a transition r - g - b - back to r.
