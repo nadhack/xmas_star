@@ -1,0 +1,83 @@
+esphome:
+  name: xmasstar
+  platform: ESP8266
+  board: esp01_1m
+  on_boot:
+    priority: -10
+    then:
+      - light.turn_on:
+          id: star
+          effect: "Random Twinkle"
+          brightness: 100%
+
+wifi:
+  ssid: YOUR_SSID
+  password: YOUR_SECRET
+  use_address: YOUR_HOSTNAME
+
+mqtt:
+  broker: YOUR_MQTT_BROKER
+
+web_server:
+  port: 80
+
+logger:
+  level: INFO
+
+ota:
+  safe_mode: True
+
+sensor:
+  - platform: wifi_signal
+    name: "xmas star signal"
+    update_interval: 300s
+
+light:
+  - platform: neopixelbus
+    name: star
+    id: star
+    type: RGB
+    pin: 2
+    num_leds: 20
+    variant: 800KBPS
+    method: ESP8266_UART1
+    effects:
+      - random:
+          name: "Fast Random"
+          transition_length: 4s
+          update_interval: 5s
+      - addressable_twinkle:
+          name: "Twinkle"
+          twinkle_probability: 5%
+          progress_interval: 4ms
+      - addressable_random_twinkle:
+          name: "Random Twinkle"
+          twinkle_probability: 5%
+          progress_interval: 32ms
+      - addressable_fireworks:
+          name: "Fireworks"
+          update_interval: 32ms
+          spark_probability: 10%
+          use_random_color: false
+          fade_out_rate: 120
+      - addressable_rainbow:
+          name: "Rainbow"
+          speed: 10
+          width: 50
+      - addressable_color_wipe:
+          name: "Color Wipe"
+          colors:
+            - red: 0%
+              green: 0%
+              blue: 0%
+              num_leds: 2
+            - random: True
+              num_leds: 5
+          add_led_interval: 100ms
+          reverse: False
+      - addressable_scan:
+          name: Scan
+          move_interval: 100ms
+          scan_width: 1
+
+
